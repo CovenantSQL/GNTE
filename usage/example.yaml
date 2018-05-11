@@ -1,0 +1,47 @@
+group:
+  -
+    name: china
+    nodes:
+        - 192.168.1.1/24
+        - 10.1.1.1/20
+        - 11.1.1.1/20
+    delay: "100ms 10ms 30%"
+    loss: "1% 10%"
+  -
+    name: eu
+    nodes:
+        - 12.1.1.1/20
+        - 13.1.1.1/20
+        - 14.1.1.1/20
+    delay: "10ms 5ms 30%"
+    loss: "1% 10%"
+  -
+    name: jpn
+    nodes:
+        - 15.1.1.1/20
+    delay: "100ms 10ms 30%"
+    duplicate: "1%"
+    rate: "100mbit"
+
+network:
+  -
+    groups:
+        - china
+        - eu
+    delay: "200ms 10ms 1%"
+    corrupt: "0.2%"
+    rate: "10mbit"
+
+  -
+    groups:
+        - china
+        - jpn
+    delay: "100ms 10ms 1%"
+    rate: "10mbit"
+
+  -
+    groups:
+        - jpn
+        - eu
+    delay: "30ms 5ms 1%"
+    rate: "100mbit"
