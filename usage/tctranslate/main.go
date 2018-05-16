@@ -102,6 +102,7 @@ func processOneNode(node string, groupName string, r root) []string {
 		tcIndex = tcIndex + 1
 	}
 
+	tcRules = append(tcRules, "tail -f /dev/null")
 	return tcRules
 }
 
@@ -160,7 +161,7 @@ func printDockerScript(r root) {
 			ip := strings.Split(node, "/")[0]
 			initFileData = append(initFileData, "docker network create --subnet="+node+" "+ip+"\n")
 
-			lanuchFileData = append(lanuchFileData, "sudo docker run -dit --rm --net "+ip+" --ip  "+ip+" -v $DIR/scripts:/scripts -v $DIR/usage:/usage --cap-add=NET_ADMIN ns")
+			lanuchFileData = append(lanuchFileData, "sudo docker run -dit --rm --net "+ip+" --ip  "+ip+" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN ns /scripts/" + ip + ".sh")
 		}
 	}
 
