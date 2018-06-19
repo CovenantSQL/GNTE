@@ -163,7 +163,7 @@ func printRules(rules []string) {
 	fmt.Println()
 }
 
-func printTcScript(rules []string, node string) {
+func printTcScript(rules []string, node string, groupName string) {
 	ip := strings.Split(node, "/")[0]
 	fmt.Println(ip)
 
@@ -172,7 +172,7 @@ func printTcScript(rules []string, node string) {
 	data = []byte(rulestr + "\n")
 
 	//	fmt.Println(rulestr)
-	err := ioutil.WriteFile("scripts/"+ip+".sh", data, 0777)
+	err := ioutil.WriteFile("scripts/"+groupName+ip+".sh", data, 0777)
 	if err != nil {
 		fmt.Println(err)
 	}
@@ -208,10 +208,11 @@ func printDockerScript(r root) {
 	for _, group := range r.Group {
 		for _, node := range group.Nodes {
 			ip := strings.Split(node, "/")[0]
+			launchFileData = append(launchFileData, "echo starting "+group.Name+ip)
 			launchFileData = append(launchFileData, "docker run -dit --rm --net thunderdb_testnet --ip "+ip+
-				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+ip+" ns /scripts/"+ip+".sh")
+				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+group.Name+ip+" ns /scripts/"+group.Name+ip+".sh")
 
-			cleanFileData = append(cleanFileData, "docker stop "+ip)
+			cleanFileData = append(cleanFileData, "docker rm -f "+group.Name+ip)
 		}
 	}
 	cleanFileData = append(cleanFileData, "docker network rm thunderdb_testnet")
@@ -320,7 +321,7 @@ func main() {
 		for _, node := range group.Nodes {
 			tcRules := processOneNode(node, group.Name, r)
 			//4. print tc tree
-			printTcScript(tcRules, node)
+			printTcScript(tcRules, node, group.Name)
 		}
 	}
 	printDockerScript(r)
