@@ -1,28 +1,86 @@
-# 网络拓扑描述语言
+# Network Simulator
 build a cluster with traffic control
-## YAML形式
+
+## Before Use
+install docker
+
+install [graphviz](https://graphviz.gitlab.io/download/)
+##### Ubuntu
+```sudo apt install graphviz```
+##### MacOS
+```brew install graphviz```
+
+
+## Build and Run
+#### 1. build docker image
+Clone this repo and running ```build.sh``` script, there should be a image named ```ns``` in your docker environment.
+
+#### 2. modify network definition file
+Edit ```example.yaml``` as your expect.
+
+The rules of this file are down below at last section of this document.
+
+#### 3. generate running scripts
+Running following command:
+
+```
+go build -o ns
+./ns
+```
+or
+
+```
+go run main.go
+```
+After that, there should be some more shell scripts and a .gv file in root folder:
+
+```
+launch.sh
+clean.sh
+graph.gv
+scripts/[ip].sh
+```
+#### 4. start simulate network
+Running ```launch.sh```
+
+#### 5. [optional]draw network graph
+Running ```dot -Tpng graph.gv -o graph.png```
+
+#### 6. running your own program in testnet
+The containers are name after their ips. For example, there are containers running 10.1.1.2 and 10.8.1.2, you can running ```docker exec -it 10.1.1.2 ping 10.8.1.2``` to test network connection between these two networks.
+
+Replace "ping 10.8.1.2" to any program or script you like.
+
+#### 7. [optional]clean network
+Running ```clean.sh```
+
+## Modify Network Definition
+The network description sample is in ```example.yaml```. You can edit it directly.
+#### sample
 ```
 group:
   -
     name: china
     nodes:
-        - 192.168.1.1/24
-        - 10.1.1.1/20
-        - 11.1.1.1/20
+        - 10.1.1.2/24
+        - 10.2.1.1/16
+        - 10.3.1.1/20
+        - 10.4.1.1/20
     delay: "100ms 10ms 30%"
     loss: "1% 10%"
   -
     name: eu
     nodes:
-        - 12.1.1.1/20
-        - 13.1.1.1/20
-        - 14.1.1.1/20
+        - 10.5.1.1/20
+        - 10.6.1.1/20
+        - 10.7.1.1/20
     delay: "10ms 5ms 30%"
     loss: "1% 10%"
   -
     name: jpn
     nodes:
-        - 15.1.1.1/20
+        - 10.8.1.2/24
+        - 10.9.1.2/24
     delay: "100ms 10ms 30%"
     duplicate: "1%"
     rate: "100mbit"
@@ -50,33 +108,26 @@ network:
     delay: "30ms 5ms 1%"
     rate: "100mbit"
 ```
+### Description
+The definition contains two section, group and network. Group define ips and describe network info between them. Network describe network info between groups. 
+#### group
+**name**: unique name of this group
 
-## 关键词说明
-### node
-描述单机的基础属性，可以不写，表示机器无限制。规则只应用于出口(上行)
+**node**: list ips of this ip. Can only between "8.x.x.2 ~ 15.x.x.254" and must written in CIDR format.
 
-### group
-描述单机组成的集群或区域，可以嵌套group
+**network params**: 
+Support 6 tc network simulate params:
 
-### network
-整个网络的描述入口，写入这里的会最终翻译成TC规则
+```
+delay
+loss
+duplicate
+corrupt
+reorder
+rate
+```
+The value of these params are exactly like ```tc``` command.
+#### network
+**groups**: list of group names.
 
-### ip
-后面跟着机器IP，可以用CIDR描述多个机器
-
-### delay
-delay 100ms ,同时,大约有 30% 的包会延迟 ± 10ms 发送
-
-### loss
-丢包率，同TC参数
-
-### duplicate
-重复数据包概率，同TC参数
-
-### rate
-限速度参数，根据TC的定义，这块的限速不是精准限速，会在这个值浮动一些
-
-## 规则冲突处理
-同一个级别的网络，如node之间，group之间，以文件顺序最后写的为准。
-
-不同级别的网络为嵌套规则，叠加生效
+**network params**: same as group section
