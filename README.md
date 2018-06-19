@@ -1,5 +1,5 @@
-# Network Simulator
-build a cluster with traffic control
+# GNTE
+GNTE(Global Network Topology Emulator) is a docker based all-in-one emulator which emulating unstable global network, such as random delay, packet loss, etc.
 
 ## Before Use
 install docker
