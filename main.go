@@ -71,13 +71,32 @@ func processOneNode(node string, groupName string, r root) []string {
 	tcIndex := 10
 	//3. build tc tree for this node
 	for _, group := range r.Group {
-		rule := "tc class add dev eth0 parent 1: classid 1:" + strconv.Itoa(tcIndex) + " htb rate 10gbps"
-		tcRules = append(tcRules, rule)
 		if group.Name == groupName { //local group
+			rule := "tc class add dev eth0 parent 1: classid 1:" + strconv.Itoa(tcIndex) + " htb"
+			if group.Rate != "" {
+				rule = rule + " rate " + group.Rate
+			} else {
+				rule = rule + " rate 10gbps"
+			}
+			tcRules = append(tcRules, rule)
 			//	3.1 parse other node in same group
 
 			rule = "tc qdisc add dev eth0 parent 1:" + strconv.Itoa(tcIndex) + " handle " + strconv.Itoa(tcIndex) + ": netem"
-			rule = rule + " delay " + group.Delay
+			if group.Delay != "" {
+				rule = rule + " delay " + group.Delay
+			}
+			if group.Corrupt != "" {
+				rule = rule + " corrupt " + group.Corrupt
+			}
+			if group.Duplicate != "" {
+				rule = rule + " duplicate " + group.Duplicate
+			}
+			if group.Loss != "" {
+				rule = rule + " loss " + group.Loss
+			}
+			if group.Reorder != "" {
+				rule = rule + " reorder " + group.Reorder
+			}
 			tcRules = append(tcRules, rule)
 			for _, otherNode := range group.Nodes {
 				if otherNode == node {
@@ -94,15 +113,37 @@ func processOneNode(node string, groupName string, r root) []string {
 			// find network first
 			for _, network := range r.Network {
 				if keyInArray(group.Name, network.Groups) && keyInArray(groupName, network.Groups) {
+					rule := "tc class add dev eth0 parent 1: classid 1:" + strconv.Itoa(tcIndex) + " htb"
+					if network.Rate != "" {
+						rule = rule + " rate " + network.Rate
+					} else {
+						rule = rule + " rate 10gbps"
+					}
+					tcRules = append(tcRules, rule)
+
 					rule = "tc qdisc add dev eth0 parent 1:" + strconv.Itoa(tcIndex) + " handle " + strconv.Itoa(tcIndex) + ": netem"
-					rule = rule + " delay " + network.Delay
+					if network.Delay != "" {
+						rule = rule + " delay " + network.Delay
+					}
+					if network.Corrupt != "" {
+						rule = rule + " corrupt " + network.Corrupt
+					}
+					if network.Duplicate != "" {
+						rule = rule + " duplicate " + network.Duplicate
+					}
+					if network.Loss != "" {
+						rule = rule + " loss " + network.Loss
+					}
+					if network.Reorder != "" {
+						rule = rule + " reorder " + network.Reorder
+					}
 					tcRules = append(tcRules, rule)
 				}
 			}
 
 			//3.4 build tc leaf for group-connection
 			for _, otherNode := range group.Nodes {
-				rule = "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode + " flowid 1:" + strconv.Itoa(tcIndex)
+				rule := "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode + " flowid 1:" + strconv.Itoa(tcIndex)
 				tcRules = append(tcRules, rule)
 			}
 		}
