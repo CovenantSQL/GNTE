@@ -123,7 +123,7 @@ func printTcScript(rules []string, node string) {
 	data = []byte(rulestr + "\n")
 
 	//	fmt.Println(rulestr)
-	err := ioutil.WriteFile(ip+".sh", data, 0777)
+	err := ioutil.WriteFile("scripts/"+ip+".sh", data, 0777)
 	if err != nil {
 		fmt.Println(err)
 	}
