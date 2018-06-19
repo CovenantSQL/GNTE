@@ -217,6 +217,13 @@ func printDockerScript(r root) {
 	}
 	cleanFileData = append(cleanFileData, "docker network rm thunderdb_testnet")
 
+
+	// run dot convertion
+	// dot -Tpng graph.gv -o graph.png
+	launchFileData = append(launchFileData, "docker run --rm -it -v $DIR/scripts:/scripts ns dot -Tpng scripts/graph.gv -o scripts/graph.png")
+	launchFileData = append(launchFileData, "mv $DIR/scripts/graph.png $DIR/graph.png")
+
+
 	launchFileByte := []byte(strings.Join(launchFileData, "\n") + "\n")
 	_, err = launchFile.Write(launchFileByte)
 	if err != nil {
@@ -233,7 +240,7 @@ func printDockerScript(r root) {
 func printGraphScript(r root) {
 
 	gvFile, err := os.OpenFile(
-		"graph.gv",
+		"scripts/graph.gv",
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
 		0666,
 	)
@@ -302,7 +309,6 @@ func printGraphScript(r root) {
 	3.4 build tc leaf for group-connection
 4. print tc tree
 */
-//TODO add all tc param support
 func main() {
 	r := root{}
 	//TODO 1. read yaml from specific file
@@ -327,7 +333,4 @@ func main() {
 	printDockerScript(r)
 
 	printGraphScript(r)
-	//TODO 2. check dot commandline
-	// dot -Tpng graph.gv -o graph.png
-
 }
