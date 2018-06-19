@@ -15,23 +15,31 @@ type tcParams struct {
 	Loss      string `yaml:"loss"`
 	Duplicate string `yaml:"duplicate"`
 	Rate      string `yaml:"rate"`
+	Corrupt   string `yaml:"corrupt"`
+	Reorder   string `yaml:"reorder"`
 }
 
 type group struct {
-	Name      string   `yaml:"name"`
-	Delay     string   `yaml:"delay"`
-	Loss      string   `yaml:"loss"`
-	Duplicate string   `yaml:"duplicate"`
-	Rate      string   `yaml:"rate"`
-	Nodes     []string `yaml:"nodes"`
+	Name  string   `yaml:"name"`
+	Nodes []string `yaml:"nodes"`
+
+	Delay     string `yaml:"delay"`
+	Loss      string `yaml:"loss"`
+	Duplicate string `yaml:"duplicate"`
+	Rate      string `yaml:"rate"`
+	Corrupt   string `yaml:"corrupt"`
+	Reorder   string `yaml:"reorder"`
 }
 
 type network struct {
-	Groups    []string `yaml:"groups"`
-	Delay     string   `yaml:"delay"`
-	Loss      string   `yaml:"loss"`
-	Duplicate string   `yaml:"duplicate"`
-	Rate      string   `yaml:"rate"`
+	Groups []string `yaml:"groups"`
+
+	Delay     string `yaml:"delay"`
+	Loss      string `yaml:"loss"`
+	Duplicate string `yaml:"duplicate"`
+	Rate      string `yaml:"rate"`
+	Corrupt   string `yaml:"corrupt"`
+	Reorder   string `yaml:"reorder"`
 }
 
 type root struct {
@@ -152,20 +160,20 @@ func printDockerScript(r root) {
 
 	var launchFileData, cleanFileData []string
 	launchFileData = append(launchFileData, "#!/bin/bash\n")
+	launchFileData = append(launchFileData, "docker network create --subnet=10.0.0.1/5 thunderdb_testnet")
 	launchFileData = append(launchFileData, `DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"`)
 	cleanFileData = append(cleanFileData, "#!/bin/bash\n")
 
 	for _, group := range r.Group {
 		for _, node := range group.Nodes {
 			ip := strings.Split(node, "/")[0]
-			launchFileData = append(launchFileData, "docker network create --subnet="+node+" "+ip)
-			launchFileData = append(launchFileData, "docker run -dit --rm --net "+ip+" --ip  "+ip+
+			launchFileData = append(launchFileData, "docker run -dit --rm --net thunderdb_testnet --ip "+ip+
 				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+ip+" ns /scripts/"+ip+".sh")
 
 			cleanFileData = append(cleanFileData, "docker stop "+ip)
-			cleanFileData = append(cleanFileData, "docker network rm "+ip)
 		}
 	}
+	cleanFileData = append(cleanFileData, "docker network rm thunderdb_testnet")
 
 	launchFileByte := []byte(strings.Join(launchFileData, "\n") + "\n")
 	_, err = launchFile.Write(launchFileByte)
@@ -279,4 +287,5 @@ func main() {
 	printGraphScript(r)
 	//TODO 2. check dot commandline
 	// dot -Tpng graph.gv -o graph.png
+
 }
