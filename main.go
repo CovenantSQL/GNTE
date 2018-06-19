@@ -130,18 +130,7 @@ func printTcScript(rules []string, node string) {
 }
 
 func printDockerScript(r root) {
-
-	initFile, err := os.OpenFile(
-		"init.sh",
-		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
-		0777,
-	)
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer initFile.Close()
-
-	lanuchFile, err := os.OpenFile(
+	launchFile, err := os.OpenFile(
 		"launch.sh",
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
 		0777,
@@ -149,33 +138,46 @@ func printDockerScript(r root) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	defer lanuchFile.Close()
+	defer launchFile.Close()
 
-	var initFileData, lanuchFileData []string
-	initFileData = append(initFileData, "#!/bin/bash\n")
-	lanuchFileData = append(lanuchFileData, "#!/bin/bash\n")
-	lanuchFileData = append(lanuchFileData, `DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"`)
+	cleanFile, err := os.OpenFile(
+		"clean.sh",
+		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
+		0777,
+	)
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer cleanFile.Close()
+
+	var launchFileData, cleanFileData []string
+	launchFileData = append(launchFileData, "#!/bin/bash\n")
+	launchFileData = append(launchFileData, `DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"`)
+	cleanFileData = append(cleanFileData, "#!/bin/bash\n")
 
 	for _, group := range r.Group {
 		for _, node := range group.Nodes {
 			ip := strings.Split(node, "/")[0]
-			initFileData = append(initFileData, "docker network create --subnet="+node+" "+ip)
+			launchFileData = append(launchFileData, "docker network create --subnet="+node+" "+ip)
+			launchFileData = append(launchFileData, "docker run -dit --rm --net "+ip+" --ip  "+ip+
+				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+ip+" ns /scripts/"+ip+".sh")
 
-			lanuchFileData = append(lanuchFileData, "sudo docker run -dit --rm --net "+ip+" --ip  "+ip+" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN ns /scripts/"+ip+".sh")
+			cleanFileData = append(cleanFileData, "docker stop "+ip)
+			cleanFileData = append(cleanFileData, "docker network rm "+ip)
 		}
 	}
 
-	initFileByte := []byte(strings.Join(initFileData, "\n") + "\n")
-	lanuchFileByte := []byte(strings.Join(lanuchFileData, "\n") + "\n")
-	_, err = initFile.Write(initFileByte)
-	if err != nil {
-		fmt.Println(err)
-	}
-	_, err = lanuchFile.Write(lanuchFileByte)
+	launchFileByte := []byte(strings.Join(launchFileData, "\n") + "\n")
+	_, err = launchFile.Write(launchFileByte)
 	if err != nil {
 		fmt.Println(err)
 	}
 
+	cleanFileByte := []byte(strings.Join(cleanFileData, "\n") + "\n")
+	_, err = cleanFile.Write(cleanFileByte)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func printGraphScript(r root) {
@@ -250,9 +252,9 @@ func printGraphScript(r root) {
 	3.4 build tc leaf for group-connection
 4. print tc tree
 */
+//TODO add all tc param support
 func main() {
 	r := root{}
-	//1. read yaml from file
 	//TODO 1. read yaml from specific file
 	data, err := ioutil.ReadFile("example.yaml")
 	if err != nil {
