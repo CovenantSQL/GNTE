@@ -4,13 +4,6 @@ build a cluster with traffic control
 ## Before Use
 install docker
 
-install [graphviz](https://graphviz.gitlab.io/download/)
-##### Ubuntu
-```sudo apt install graphviz```
-##### MacOS
-```brew install graphviz```
-
-
 ## Build and Run
 #### 1. build docker image
 Clone this repo and running ```build.sh``` script, there should be a image named ```ns``` in your docker environment.
@@ -32,26 +25,23 @@ or
 ```
 go run main.go
 ```
-After that, there should be some more shell scripts and a .gv file in root folder:
+After that, there should be some more shell scripts file in root folder:
 
 ```
 launch.sh
 clean.sh
-graph.gv
-scripts/[ip].sh
 ```
 #### 4. start simulate network
 Running ```launch.sh```
 
-#### 5. [optional]draw network graph
-Running ```dot -Tpng graph.gv -o graph.png```
+Then all thunderdb testnet docker should be running, and a graph drawed base on this network is lying in the root folder, which name ```graph.png```.
 
-#### 6. running your own program in testnet
-The containers are name after their ips. For example, there are containers running 10.1.1.2 and 10.8.1.2, you can running ```docker exec -it 10.1.1.2 ping 10.8.1.2``` to test network connection between these two networks.
+#### 5. running your own program in testnet
+The containers are name after their group_name+ip. For example, there are containers running 10.1.1.2 and 10.8.1.2, you can running ```docker exec -it china10.1.1.2 ping 10.8.1.2``` to test network connection between these two networks.
 
 Replace "ping 10.8.1.2" to any program or script you like.
 
-#### 7. [optional]clean network
+#### 6. [optional]clean network
 Running ```clean.sh```
 
 ## Modify Network Definition
