@@ -1,3 +1,5 @@
+<img src="logo/logo.jpeg" width=200>
+
 # GNTE
 GNTE(Global Network Topology Emulator) is a docker based all-in-one emulator which emulating unstable global network, such as random delay, packet loss, etc.
 
