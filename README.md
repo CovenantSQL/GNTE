@@ -36,7 +36,11 @@ clean.sh
 ### 4. start simulate network
 Run ```launch.sh```
 
-Then all thunderdb testnet docker should be running, and a graph drawed base on this network is lying in the root folder, which name ```graph.png```.
+Then all thunderdb testnet docker should be running, you could use ```docker ps -a``` to see all container node: 
+<img src="logo/container_node.png">
+
+And a graph drawed base on this network is lying in the root folder, which name ```graph.png```.
+<img src="logo/graph.png">
 
 ### 5. run your own program in testnet
 The containers are name after their group_name+ip. For example, there are containers named 10.1.1.2 and 10.8.1.2, you can running ```docker exec -it china10.1.1.2 ping 10.8.1.2``` to test network connection between these two networks.
