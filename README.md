@@ -33,13 +33,13 @@ After that, there should be some more shell scripts file in root folder:
 launch.sh
 clean.sh
 ```
-### 4. start simulate network
+### 4. launch emulate network
 Run ```launch.sh```
 
 Then all thunderdb testnet docker should be running, you could use ```docker ps -a``` to see all container node: 
 <img src="logo/container_node.png">
 
-And a graph drawed base on this network is lying in the root folder, which name ```graph.png```.
+And a graph drawed base on this network is lying in the root folder, which name ```graph.png```:
 <img src="logo/graph.png">
 
 ### 5. run your own program in testnet
@@ -115,7 +115,7 @@ The definition contains two section: group and network. Group defines ips and de
 - **node**: list ips of this network. Can only between "8.x.x.2 ~ 15.x.x.254" and must written in CIDR format.
 
 - **network params**:
-Support 6 tc network simulate params:
+Support 6 tc network limit params:
 
     ```
     delay
