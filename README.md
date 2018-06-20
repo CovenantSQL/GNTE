@@ -1,22 +1,20 @@
 <img src="logo/logo.jpeg" width=200>
 
 # GNTE
-GNTE(Global Network Topology Emulator) is a docker based all-in-one emulator which emulating unstable global network, such as random delay, packet loss, etc.
+GNTE(Global Network Topology Emulator) is a docker-based all-in-one unstable global network emulator. It emulates functionality such as random delay and packet loss.
 
 ## Before Use
-install docker
+Install docker
 
 ## Build and Run
 ### 1. build docker image
-Clone this repo and run ```build.sh```, there should be an image named ```ns``` in your docker environment.
+Clone this repo and run ```build.sh```. There should be an image named ```ns``` in your docker environment.
 
 ### 2. modify network definition file
-Edit ```example.yaml``` as your expect.
-
-The rules of this file are down below the last section.
+Edit ```example.yaml``` to fit your requirements. The rules of this file are described in the bottom section.
 
 ### 3. generate running scripts
-Run following command:
+Run the following command:
 
 ```
 go build -o ns
@@ -27,31 +25,31 @@ or
 ```
 go run main.go
 ```
-After that, there should be some more shell scripts file in root folder:
+Afterwards, your root folder should contain two shell scripts:
 
 ```
 launch.sh
 clean.sh
 ```
-### 4. launch emulate network
+### 4. launch network emulator
 Run ```launch.sh```
 
-Then all thunderdb testnet docker should be running, you could use ```docker ps -a``` to see all container node: 
+Once all thunderdb testnet dockers are running, you can use ```docker ps -a``` to see all container nodes: 
 <img src="logo/container_node.png">
 
-And a graph drawed base on this network is lying in the root folder, which name ```graph.png```:
+You can also find a graph of the network in ```graph.png``` under your root folder:
 <img src="logo/graph.png">
 
 ### 5. run your own program in testnet
-The containers are name after their group_name+ip. For example, there are containers named 10.1.1.2 and 10.8.1.2, you can running ```docker exec -it china10.1.1.2 ping 10.8.1.2``` to test network connection between these two networks.
+Containers are referenced by group_name+ip. For example, given containers 10.1.1.2 and 10.8.1.2, you can run ```docker exec -it china10.1.1.2 ping 10.8.1.2``` to test the connection between these two networks.
 
-Replace "ping 10.8.1.2" to any program or script you like.
+You can replace "ping 10.8.1.2" in the example above with any program or script.
 
-### 6. [optional]clean network
+### 6. [optional] clean network
 Run ```clean.sh```
 
 ## Modify Network Definition
-The network description sample is in ```example.yaml```. You can edit it directly.
+A sample network description is provided in ```example.yaml```, which you can edit directly.
 
 ### sample
 ```
@@ -107,16 +105,15 @@ network:
 ```
 
 ## Description
-The definition contains two section: group and network. Group defines ips and describes network info between them. Network describes network info between groups.
+The network definition contains two sections: group and network. Group defines ips and describes network info between them. Network describes network info between groups.
 
 ### group
-- **name**: unique name of this group
+- **name**: unique name of the group
 
-- **node**: list ips of this network. Can only between "8.x.x.2 ~ 15.x.x.254" and must written in CIDR format.
+- **node**: list of ips in the network. Must be between "8.x.x.2 ~ 15.x.x.254" and written in CIDR format
 
 - **network params**:
-Support 6 tc network limit params:
-
+The following 6 tc network limit parameters are supported:
     ```
     delay
     loss
@@ -125,9 +122,9 @@ Support 6 tc network limit params:
     reorder
     rate
     ```
-The value of these params are exactly like ```tc``` command.
+The values of these parameters are exactly like those of the ```tc``` command.
 
 ### network
-- **groups**: list of group names.
+- **groups**: list of group names
 
-- **network params**: same as group section
+- **network params**: same as group
