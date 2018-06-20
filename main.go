@@ -217,12 +217,10 @@ func printDockerScript(r root) {
 	}
 	cleanFileData = append(cleanFileData, "docker network rm thunderdb_testnet")
 
-
 	// run dot convertion
 	// dot -Tpng graph.gv -o graph.png
 	launchFileData = append(launchFileData, "docker run --rm -it -v $DIR/scripts:/scripts ns dot -Tpng scripts/graph.gv -o scripts/graph.png")
 	launchFileData = append(launchFileData, "mv $DIR/scripts/graph.png $DIR/graph.png")
-
 
 	launchFileByte := []byte(strings.Join(launchFileData, "\n") + "\n")
 	_, err = launchFile.Write(launchFileByte)
@@ -259,12 +257,30 @@ func printGraphScript(r root) {
 		gvFileData = append(gvFileData, "        style = rounded;")
 		for i := 0; i < len(group.Nodes); i++ {
 			for j := i + 1; j < len(group.Nodes); j++ {
-				nodei := group.Nodes[i]
-				nodej := group.Nodes[j]
 				//"10.2.1.1/16" -> "10.3.1.1/20" [arrowhead=none, arrowtail=none, label="delay\n 100ms ±10ms 30%"];
-				gvFileData = append(gvFileData, "        \""+nodei+"\" -> \""+nodej+
-					"\" [arrowhead=none, arrowtail=none, label=\"delay "+
-					group.Delay+"\"];")
+				arrowinfo := "        \"" + group.Nodes[i] + "\" -> \"" + group.Nodes[j] +
+					"\" [arrowhead=none, arrowtail=none, label=\""
+				if group.Delay != "" {
+					arrowinfo = arrowinfo + "delay " + group.Delay + `\n`
+				}
+				if group.Corrupt != "" {
+					arrowinfo = arrowinfo + "corrupt" + group.Corrupt + `\n`
+				}
+				if group.Duplicate != "" {
+					arrowinfo = arrowinfo + "duplicate " + group.Duplicate + `\n`
+				}
+				if group.Loss != "" {
+					arrowinfo = arrowinfo + "loss " + group.Loss + `\n`
+				}
+				if group.Reorder != "" {
+					arrowinfo = arrowinfo + "reorder " + group.Reorder + `\n`
+				}
+
+				if group.Rate != "" {
+					arrowinfo = arrowinfo + "rate " + group.Rate + `\n`
+				}
+				arrowinfo = arrowinfo + "\"];"
+				gvFileData = append(gvFileData, arrowinfo)
 			}
 		}
 		gvFileData = append(gvFileData, "    }")
@@ -283,10 +299,31 @@ func printGraphScript(r root) {
 						groupNodej = group.Nodes[0]
 					}
 				}
-				gvFileData = append(gvFileData, "    \""+groupNodei+"\" -> \""+groupNodej+
-					"\"\n        [ltail=cluster_"+network.Groups[i]+", lhead=cluster_"+network.Groups[j]+
-					", arrowhead=none, arrowtail=none,\n        label=\"delay "+
-					network.Delay+"\"];")
+				arrowinfo := "    \"" + groupNodei + "\" -> \"" + groupNodej +
+					"\"\n        [ltail=cluster_" + network.Groups[i] + ", lhead=cluster_" + network.Groups[j] +
+					", arrowhead=none, arrowtail=none,\n        label=\""
+				if network.Delay != "" {
+					arrowinfo = arrowinfo + "delay " + network.Delay + `\n`
+				}
+				if network.Corrupt != "" {
+					arrowinfo = arrowinfo + "corrupt" + network.Corrupt + `\n`
+				}
+				if network.Duplicate != "" {
+					arrowinfo = arrowinfo + "duplicate " + network.Duplicate + `\n`
+				}
+				if network.Loss != "" {
+					arrowinfo = arrowinfo + "loss " + network.Loss + `\n`
+				}
+				if network.Reorder != "" {
+					arrowinfo = arrowinfo + "reorder " + network.Reorder + `\n`
+				}
+
+				if network.Rate != "" {
+					arrowinfo = arrowinfo + "rate " + network.Rate + `\n`
+				}
+				arrowinfo = arrowinfo + "\"];"
+
+				gvFileData = append(gvFileData, arrowinfo)
 			}
 		}
 	}
