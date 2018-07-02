@@ -56,7 +56,7 @@ func keyInArray(key string, array []string) bool {
 	return false
 }
 
-func processOneNode(node string, groupName string, r root) []string {
+func processOneNode(node string, groupName string, r root, nodemap map[string]bool) []string {
 
 	var tcRules []string
 
@@ -79,8 +79,8 @@ func processOneNode(node string, groupName string, r root) []string {
 				rule = rule + " rate 10gbps"
 			}
 			tcRules = append(tcRules, rule)
-			//	3.1 parse other node in same group
 
+			//	3.1 parse other node in same group
 			rule = "tc qdisc add dev eth0 parent 1:" + strconv.Itoa(tcIndex) + " handle " + strconv.Itoa(tcIndex) + ": netem"
 			if group.Delay != "" {
 				rule = rule + " delay " + group.Delay
@@ -103,9 +103,18 @@ func processOneNode(node string, groupName string, r root) []string {
 					continue
 				}
 
+				//find if has pair in node-othernode
+				if pair, ok := nodemap[node+otherNode]; ok && pair {
+					continue
+				}
+
 				//3.2 build tc leaf for inner-group
 				rule = "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode + " flowid 1:" + strconv.Itoa(tcIndex)
 				tcRules = append(tcRules, rule)
+
+				//set pair in node-othernode
+				nodemap[node+otherNode] = true
+				nodemap[otherNode+node] = true
 			}
 
 		} else { //other group
@@ -143,8 +152,17 @@ func processOneNode(node string, groupName string, r root) []string {
 
 			//3.4 build tc leaf for group-connection
 			for _, otherNode := range group.Nodes {
+				//find if has pair in node-othernode
+				if pair, ok := nodemap[node+otherNode]; ok && pair {
+					continue
+				}
+
 				rule := "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode + " flowid 1:" + strconv.Itoa(tcIndex)
 				tcRules = append(tcRules, rule)
+
+				//set pair in node-othernode
+				nodemap[node+otherNode] = true
+				nodemap[otherNode+node] = true
 			}
 		}
 
@@ -359,10 +377,11 @@ func main() {
 		fmt.Println(err)
 	}
 
+	nodemap := make(map[string]bool)
 	//2. select one node
 	for _, group := range r.Group {
 		for _, node := range group.Nodes {
-			tcRules := processOneNode(node, group.Name, r)
+			tcRules := processOneNode(node, group.Name, r, nodemap)
 			//4. print tc tree
 			printTcScript(tcRules, node, group.Name)
 		}
