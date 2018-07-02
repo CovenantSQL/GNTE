@@ -201,7 +201,7 @@ func printDockerScript(r root) {
 
 	var launchFileData, cleanFileData []string
 	launchFileData = append(launchFileData, "#!/bin/bash\n")
-	launchFileData = append(launchFileData, "docker network create --subnet=10.0.0.1/5 thunderdb_testnet")
+	launchFileData = append(launchFileData, "docker network create --subnet=10.250.0.1/16 thunderdb_testnet")
 	launchFileData = append(launchFileData, `DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"`)
 	cleanFileData = append(cleanFileData, "#!/bin/bash\n")
 
@@ -220,7 +220,7 @@ func printDockerScript(r root) {
 	// run dot convertion
 	// dot -Tpng graph.gv -o graph.png
 	launchFileData = append(launchFileData, "docker run --rm -it -v $DIR/scripts:/scripts gnte dot -Tpng scripts/graph.gv -o scripts/graph.png")
-	launchFileData = append(launchFileData, "mv $DIR/scripts/graph.png $DIR/graph.png")
+	launchFileData = append(launchFileData, "mv -f $DIR/scripts/graph.png $DIR/graph.png")
 
 	launchFileByte := []byte(strings.Join(launchFileData, "\n") + "\n")
 	_, err = launchFile.Write(launchFileByte)

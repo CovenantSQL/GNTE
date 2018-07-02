@@ -41,9 +41,9 @@ You can also find a graph of the network in ```graph.png``` under your root fold
 <img src="logo/graph.png">
 
 ### 5. run your own program in testnet
-Containers are referenced by group_name+ip. For example, given containers 10.1.1.2 and 10.8.1.2, you can run ```docker exec -it china10.1.1.2 ping 10.8.1.2``` to test the connection between these two networks.
+Containers are referenced by group_name+ip. For example, given containers 10.250.1.2 and 10.250.8.2, you can run ```docker exec -it china10.250.1.2 ping 10.250.8.2``` to test the connection between these two networks.
 
-You can replace "ping 10.8.1.2" in the example above with any program or script.
+You can replace "ping 10.250.8.2" in the example above with any program or script.
 
 ### 6. [optional] clean network
 Run ```clean.sh```
@@ -53,29 +53,30 @@ A sample network description is provided in ```example.yaml```, which you can ed
 
 ### sample
 ```
+# Only support 10.250.0.2 ~ 10.250.254.254
 group:
   -
     name: china
     nodes:
-        - 10.1.1.2/24
-        - 10.2.1.1/16
-        - 10.3.1.1/20
-        - 10.4.1.1/20
+        - 10.250.1.2/32
+        - 10.250.2.2/32
+        - 10.250.3.2/32
+        - 10.250.4.2/32
     delay: "100ms 10ms 30%"
     loss: "1% 10%"
   -
     name: eu
     nodes:
-        - 10.5.1.1/20
-        - 10.6.1.1/20
-        - 10.7.1.1/20
+        - 10.250.5.2/32
+        - 10.250.6.2/32
+        - 10.250.7.2/32
     delay: "10ms 5ms 30%"
     loss: "1% 10%"
   -
     name: jpn
     nodes:
-        - 10.8.1.2/24
-        - 10.9.1.2/24
+        - 10.250.8.2/32
+        - 10.250.9.2/32
     delay: "100ms 10ms 30%"
     duplicate: "1%"
     rate: "100mbit"
@@ -110,7 +111,7 @@ The network definition contains two sections: group and network. Group defines i
 ### group
 - **name**: unique name of the group
 
-- **node**: list of ips in the network. Must be between "8.x.x.2 ~ 15.x.x.254" and written in CIDR format
+- **node**: list of ips in the network. Must be between "10.250.0.2 ~ 10.250.254.254" and written in CIDR format, eg. ```10.250.1.2/32```.
 
 - **network params**:
 The following 6 tc network limit parameters are supported:
