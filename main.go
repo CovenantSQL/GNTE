@@ -83,7 +83,7 @@ func processOneNode(node string, groupName string, r root, nodemap map[string]bo
 			//	3.1 parse other node in same group
 			rule = "tc qdisc add dev eth0 parent 1:" + strconv.Itoa(tcIndex) + " handle " + strconv.Itoa(tcIndex) + ": netem"
 			if group.Delay != "" {
-				rule = rule + " delay " + group.Delay
+				rule = rule + " delay " + group.Delay + " distribution normal"
 			}
 			if group.Corrupt != "" {
 				rule = rule + " corrupt " + group.Corrupt
@@ -132,7 +132,7 @@ func processOneNode(node string, groupName string, r root, nodemap map[string]bo
 
 					rule = "tc qdisc add dev eth0 parent 1:" + strconv.Itoa(tcIndex) + " handle " + strconv.Itoa(tcIndex) + ": netem"
 					if network.Delay != "" {
-						rule = rule + " delay " + network.Delay
+						rule = rule + " delay " + network.Delay + " distribution normal"
 					}
 					if network.Corrupt != "" {
 						rule = rule + " corrupt " + network.Corrupt
