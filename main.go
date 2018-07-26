@@ -169,6 +169,8 @@ func processOneNode(node string, groupName string, r root, nodemap map[string]bo
 		tcIndex = tcIndex + 1
 	}
 
+	tcRules = append(tcRules, "cat /scripts/bashrc >> ~/.bashrc")
+	tcRules = append(tcRules, ". ~/.bashrc")
 	tcRules = append(tcRules, "tail -f /dev/null")
 	return tcRules
 }
