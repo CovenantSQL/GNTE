@@ -219,7 +219,7 @@ func printDockerScript(r root) {
 
 	var launchFileData, cleanFileData []string
 	launchFileData = append(launchFileData, "#!/bin/bash\n")
-	launchFileData = append(launchFileData, "docker network create --subnet=10.250.0.1/16 thunderdb_testnet")
+	launchFileData = append(launchFileData, "docker network create --subnet=10.250.0.1/16 CovenantSQL_testnet")
 	launchFileData = append(launchFileData, `DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"`)
 	cleanFileData = append(cleanFileData, "#!/bin/bash\n")
 
@@ -227,13 +227,13 @@ func printDockerScript(r root) {
 		for _, node := range group.Nodes {
 			ip := strings.Split(node, "/")[0]
 			launchFileData = append(launchFileData, "echo starting "+group.Name+ip)
-			launchFileData = append(launchFileData, "docker run -dit --rm --net thunderdb_testnet --ip "+ip+
+			launchFileData = append(launchFileData, "docker run -dit --rm --net CovenantSQL_testnet --ip "+ip+
 				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+group.Name+ip+" gnte /scripts/"+group.Name+ip+".sh")
 
 			cleanFileData = append(cleanFileData, "docker rm -f "+group.Name+ip)
 		}
 	}
-	cleanFileData = append(cleanFileData, "docker network rm thunderdb_testnet")
+	cleanFileData = append(cleanFileData, "docker network rm CovenantSQL_testnet")
 
 	// run dot convertion
 	// dot -Tpng graph.gv -o graph.png
