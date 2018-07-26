@@ -34,7 +34,7 @@ clean.sh
 ### 4. launch network emulator
 Run ```launch.sh```
 
-Once all CovenantSQL testnet dockers are running, you can use ```docker ps -a``` to see all container nodes: 
+Once all CovenantSQL testnet dockers are running, you can use ```docker ps -a``` to see all container nodes:
 <img src="logo/container_node.png">
 
 You can also find a graph of the network in ```graph.png``` under your root folder:
