@@ -200,7 +200,7 @@ func printTcScript(rules []string, node string, groupName string) {
 
 func printDockerScript(r root) {
 	launchFile, err := os.OpenFile(
-		"launch.sh",
+		"scripts/launch.sh",
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
 		0777,
 	)
@@ -210,7 +210,7 @@ func printDockerScript(r root) {
 	defer launchFile.Close()
 
 	cleanFile, err := os.OpenFile(
-		"clean.sh",
+		"scripts/clean.sh",
 		os.O_WRONLY|os.O_CREATE|os.O_TRUNC,
 		0777,
 	)
@@ -222,7 +222,6 @@ func printDockerScript(r root) {
 	var launchFileData, cleanFileData []string
 	launchFileData = append(launchFileData, "#!/bin/bash\n")
 	launchFileData = append(launchFileData, "docker network create --subnet=10.250.0.1/16 CovenantSQL_testnet")
-	launchFileData = append(launchFileData, `DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"`)
 	cleanFileData = append(cleanFileData, "#!/bin/bash\n")
 
 	for _, group := range r.Group {
