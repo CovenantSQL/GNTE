@@ -13,40 +13,26 @@ Clone this repo and run ```build.sh```. There should be an image named ```ns``` 
 ### 2. modify network definition file
 Edit ```example.yaml``` to fit your requirements. The rules of this file are described in the bottom section.
 
-### 3. generate running scripts
+### 3. generate and launch network emulator
 Run the following command:
 
 ```
-go build -o ns
-./ns
+./generate.sh
 ```
-or
 
-```
-go run main.go
-```
-Afterwards, your root folder should contain two shell scripts:
-
-```
-launch.sh
-clean.sh
-```
-### 4. launch network emulator
-Run ```launch.sh```
-
-Once all CovenantSQL testnet dockers are running, you can use ```docker ps -a``` to see all container nodes:
+Once all CovenantSQL testnet dockers are running, you can use ```docker ps -a``` to see all container nodes: 
 <img src="logo/container_node.png">
 
 You can also find a graph of the network in ```graph.png``` under your root folder:
 <img src="logo/graph.png">
 
-### 5. run your own program in testnet
+### 4. run your own program in testnet
 Containers are referenced by group_name+ip. For example, given containers 10.250.1.2 and 10.250.8.2, you can run ```docker exec -it china10.250.1.2 ping 10.250.8.2``` to test the connection between these two networks.
 
 You can replace "ping 10.250.8.2" in the example above with any program or script.
 
-### 6. [optional] clean network
-Run ```clean.sh```
+### 5. [optional] clean network
+Run ```./scripts/clean.sh```
 
 ## Modify Network Definition
 A sample network description is provided in ```example.yaml```, which you can edit directly.
