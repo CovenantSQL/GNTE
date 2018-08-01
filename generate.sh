@@ -11,4 +11,4 @@ fi
 
 docker run --rm -it -v $DIR:$SRC gnte $SRC/scripts/gobuild.sh
 
-./scripts/launch.sh
+$DIR/scripts/launch.sh
