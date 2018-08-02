@@ -26,7 +26,7 @@ type node struct {
 
 type group struct {
 	Name  string `yaml:"name"`
-	Nodes []node   `yaml:"nodes"`
+	Nodes []node `yaml:"nodes"`
 
 	Delay     string `yaml:"delay"`
 	Loss      string `yaml:"loss"`
@@ -234,8 +234,8 @@ func printDockerScript(r root) {
 		for _, node := range group.Nodes {
 			ip := strings.Split(node.IP, "/")[0]
 			launchFileData = append(launchFileData, "echo starting "+group.Name+ip)
-			launchFileData = append(launchFileData, "docker run -dit --rm --net CovenantSQL_testnet --ip " + ip + " -h " + group.Name + ip+
-				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+ group.Name+ ip+ " gnte /scripts/"+ group.Name+ ip+ ".sh")
+			launchFileData = append(launchFileData, "docker run -dit --rm --net CovenantSQL_testnet --ip "+ip+" -h "+group.Name+ip+
+				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+group.Name+ip+" gnte /scripts/"+group.Name+ip+".sh")
 
 			cleanFileData = append(cleanFileData, "docker rm -f "+group.Name+ip)
 		}
