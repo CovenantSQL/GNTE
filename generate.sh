@@ -9,6 +9,6 @@ if [ -f $CLEAN ];then
     rm -rf $CLEAN
 fi
 
-docker run --rm -it -v $DIR:$SRC gnte $SRC/scripts/gobuild.sh
+docker run --rm -it -v $DIR:$SRC gnte $SRC/scripts/gobuild.sh $*
 
 $DIR/scripts/launch.sh
