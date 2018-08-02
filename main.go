@@ -374,7 +374,15 @@ func printGraphScript(r root) {
 func main() {
 	r := root{}
 	//TODO 1. read yaml from specific file
-	data, err := ioutil.ReadFile("example.yaml")
+	configPath := ""
+
+	if len(os.Args) > 1 {
+		configPath = os.Args[1]
+	} else {
+		configPath = "example.yaml"
+	}
+
+	data, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		fmt.Println(err)
 	}
