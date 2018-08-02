@@ -19,9 +19,14 @@ type tcParams struct {
 	Reorder   string `yaml:"reorder"`
 }
 
+type node struct {
+	IP  string `yaml:"ip"`
+	CMD string `yaml:"cmd"`
+}
+
 type group struct {
-	Name  string   `yaml:"name"`
-	Nodes []string `yaml:"nodes"`
+	Name  string `yaml:"name"`
+	Nodes []node   `yaml:"nodes"`
 
 	Delay     string `yaml:"delay"`
 	Loss      string `yaml:"loss"`
@@ -56,13 +61,13 @@ func keyInArray(key string, array []string) bool {
 	return false
 }
 
-func processOneNode(node string, groupName string, r root, nodemap map[string]bool) []string {
+func processOneNode(node *node, groupName string, r root, nodemap map[string]bool) []string {
 
 	var tcRules []string
 
 	//add init rules
 	tcRules = append(tcRules, "#!/bin/sh\n")
-	tcRules = append(tcRules, "#"+node)
+	tcRules = append(tcRules, "#"+node.IP)
 	tcRules = append(tcRules, "tc qdisc del dev eth0 root")
 	tcRules = append(tcRules, "tc qdisc add dev eth0 root handle 1: htb default 2")
 	tcRules = append(tcRules, "tc class add dev eth0 parent 1: classid 1:2 htb rate 10gbps")
@@ -99,22 +104,22 @@ func processOneNode(node string, groupName string, r root, nodemap map[string]bo
 			}
 			tcRules = append(tcRules, rule)
 			for _, otherNode := range group.Nodes {
-				if otherNode == node {
+				if otherNode.IP == node.IP {
 					continue
 				}
 
 				//find if has pair in node-othernode
-				if pair, ok := nodemap[node+otherNode]; ok && pair {
+				if pair, ok := nodemap[node.IP+otherNode.IP]; ok && pair {
 					continue
 				}
 
 				//3.2 build tc leaf for inner-group
-				rule = "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode + " flowid 1:" + strconv.Itoa(tcIndex)
+				rule = "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode.IP + " flowid 1:" + strconv.Itoa(tcIndex)
 				tcRules = append(tcRules, rule)
 
 				//set pair in node-othernode
-				nodemap[node+otherNode] = true
-				nodemap[otherNode+node] = true
+				nodemap[node.IP+otherNode.IP] = true
+				nodemap[otherNode.IP+node.IP] = true
 			}
 
 		} else { //other group
@@ -153,16 +158,16 @@ func processOneNode(node string, groupName string, r root, nodemap map[string]bo
 			//3.4 build tc leaf for group-connection
 			for _, otherNode := range group.Nodes {
 				//find if has pair in node-othernode
-				if pair, ok := nodemap[node+otherNode]; ok && pair {
+				if pair, ok := nodemap[node.IP+otherNode.IP]; ok && pair {
 					continue
 				}
 
-				rule := "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode + " flowid 1:" + strconv.Itoa(tcIndex)
+				rule := "tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip dst " + otherNode.IP + " flowid 1:" + strconv.Itoa(tcIndex)
 				tcRules = append(tcRules, rule)
 
 				//set pair in node-othernode
-				nodemap[node+otherNode] = true
-				nodemap[otherNode+node] = true
+				nodemap[node.IP+otherNode.IP] = true
+				nodemap[otherNode.IP+node.IP] = true
 			}
 		}
 
@@ -171,6 +176,7 @@ func processOneNode(node string, groupName string, r root, nodemap map[string]bo
 
 	tcRules = append(tcRules, "cat /scripts/bashrc >> ~/.bashrc")
 	tcRules = append(tcRules, ". ~/.bashrc")
+	tcRules = append(tcRules, node.CMD)
 	tcRules = append(tcRules, "tail -f /dev/null")
 	return tcRules
 }
@@ -183,8 +189,8 @@ func printRules(rules []string) {
 	fmt.Println()
 }
 
-func printTcScript(rules []string, node string, groupName string) {
-	ip := strings.Split(node, "/")[0]
+func printTcScript(rules []string, node *node, groupName string) {
+	ip := strings.Split(node.IP, "/")[0]
 	fmt.Println(ip)
 
 	var data []byte
@@ -226,10 +232,10 @@ func printDockerScript(r root) {
 
 	for _, group := range r.Group {
 		for _, node := range group.Nodes {
-			ip := strings.Split(node, "/")[0]
+			ip := strings.Split(node.IP, "/")[0]
 			launchFileData = append(launchFileData, "echo starting "+group.Name+ip)
-			launchFileData = append(launchFileData, "docker run -dit --rm --net CovenantSQL_testnet --ip "+ip+" -h "+group.Name+ip+
-				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+group.Name+ip+" gnte /scripts/"+group.Name+ip+".sh")
+			launchFileData = append(launchFileData, "docker run -dit --rm --net CovenantSQL_testnet --ip " + ip + " -h " + group.Name + ip+
+				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+ group.Name+ ip+ " gnte /scripts/"+ group.Name+ ip+ ".sh")
 
 			cleanFileData = append(cleanFileData, "docker rm -f "+group.Name+ip)
 		}
@@ -277,7 +283,7 @@ func printGraphScript(r root) {
 		for i := 0; i < len(group.Nodes); i++ {
 			for j := i + 1; j < len(group.Nodes); j++ {
 				//"10.2.1.1/16" -> "10.3.1.1/20" [arrowhead=none, arrowtail=none, label="delay\n 100ms ±10ms 30%"];
-				arrowinfo := "        \"" + group.Nodes[i] + "\" -> \"" + group.Nodes[j] +
+				arrowinfo := "        \"" + group.Nodes[i].IP + "\" -> \"" + group.Nodes[j].IP +
 					"\" [arrowhead=none, arrowtail=none, label=\""
 				if group.Delay != "" {
 					arrowinfo = arrowinfo + "delay " + group.Delay + `\n`
@@ -313,9 +319,9 @@ func printGraphScript(r root) {
 				// get group ip
 				for _, group := range r.Group {
 					if group.Name == network.Groups[i] {
-						groupNodei = group.Nodes[0]
+						groupNodei = group.Nodes[0].IP
 					} else if group.Name == network.Groups[j] {
-						groupNodej = group.Nodes[0]
+						groupNodej = group.Nodes[0].IP
 					}
 				}
 				arrowinfo := "    \"" + groupNodei + "\" -> \"" + groupNodej +
@@ -382,9 +388,9 @@ func main() {
 	//2. select one node
 	for _, group := range r.Group {
 		for _, node := range group.Nodes {
-			tcRules := processOneNode(node, group.Name, r, nodemap)
+			tcRules := processOneNode(&node, group.Name, r, nodemap)
 			//4. print tc tree
-			printTcScript(tcRules, node, group.Name)
+			printTcScript(tcRules, &node, group.Name)
 		}
 	}
 	printDockerScript(r)

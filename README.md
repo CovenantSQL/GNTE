@@ -29,7 +29,7 @@ You can also find a graph of the network in ```graph.png``` under your root fold
 ### 4. run your own program in testnet
 Containers are referenced by group_name+ip. For example, given containers 10.250.1.2 and 10.250.8.2, you can run ```docker exec -it china10.250.1.2 ping 10.250.8.2``` to test the connection between these two networks.
 
-You can replace "ping 10.250.8.2" in the example above with any program or script.
+You can replace the "cmd" in the group section of yaml.
 
 ### 5. [optional] clean network
 Run ```./scripts/clean.sh```
@@ -44,25 +44,43 @@ group:
   -
     name: china
     nodes:
-        - 10.250.1.2/32
-        - 10.250.2.2/32
-        - 10.250.3.2/32
-        - 10.250.4.2/32
+      -
+        ip: 10.250.1.2/32
+        cmd: "ping -c3 g.cn"
+      -
+        ip: 10.250.2.2/32
+        cmd: "ping -c3 g.cn"
+      -
+        ip: 10.250.3.2/32
+        cmd: "ping -c3 g.cn"
+      -
+        ip: 10.250.4.2/32
+        cmd: "ping -c3 g.cn"
     delay: "100ms 10ms 30%"
     loss: "1% 10%"
   -
     name: eu
     nodes:
-        - 10.250.5.2/32
-        - 10.250.6.2/32
-        - 10.250.7.2/32
+      -
+        ip: 10.250.5.2/32
+        cmd: "ping -c3 g.cn"
+      -
+        ip: 10.250.6.2/32
+        cmd: "ping -c3 g.cn"
+      -
+        ip: 10.250.7.2/32
+        cmd: "ping -c3 g.cn"
     delay: "10ms 5ms 30%"
     loss: "1% 10%"
   -
     name: jpn
     nodes:
-        - 10.250.8.2/32
-        - 10.250.9.2/32
+      -
+        ip: 10.250.8.2/32
+        cmd: "ping -c3 g.cn"
+      -
+        ip: 10.250.9.2/32
+        cmd: "ping -c3 g.cn"
     delay: "100ms 10ms 30%"
     duplicate: "1%"
     rate: "100mbit"
@@ -70,25 +88,26 @@ group:
 network:
   -
     groups:
-        - china
-        - eu
+      - china
+      - eu
     delay: "200ms 10ms 1%"
     corrupt: "0.2%"
     rate: "10mbit"
 
   -
     groups:
-        - china
-        - jpn
+      - china
+      - jpn
     delay: "100ms 10ms 1%"
     rate: "10mbit"
 
   -
     groups:
-        - jpn
-        - eu
+      - jpn
+      - eu
     delay: "30ms 5ms 1%"
     rate: "100mbit"
+
 ```
 
 ## Description
