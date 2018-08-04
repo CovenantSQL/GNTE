@@ -8,7 +8,7 @@ Install docker
 
 ## Build and Run
 ### 1. build docker image
-Clone this repo and run ```build.sh```. There should be an image named ```ns``` in your docker environment.
+Clone this repo and run `build.sh`. There should be an image named `ns` in your docker environment.
 
 ### 2. modify network definition file
 Edit ```example.yaml``` to fit your requirements. The rules of this file are described in the bottom section.
@@ -20,14 +20,14 @@ Run the following command:
 ./generate.sh
 ```
 
-Once all CovenantSQL testnet dockers are running, you can use ```docker ps -a``` to see all container nodes: 
+Once all CovenantSQL testnet dockers are running, you can use `docker ps -a` to see all container nodes: 
 <img src="logo/container_node.png">
 
-You can also find a graph of the network in ```graph.png``` under your root folder:
+You can also find a graph of the network in `graph.png` under your root folder:
 <img src="logo/graph.png">
 
 ### 4. run your own program in testnet
-Containers are referenced by group_name+ip. For example, given containers 10.250.1.2 and 10.250.8.2, you can run ```docker exec -it china10.250.1.2 ping 10.250.8.2``` to test the connection between these two networks.
+Containers are referenced by group_name+ip. For example, given containers 10.250.1.2 and 10.250.8.2, you can run `docker exec -it china10.250.1.2 ping 10.250.8.2` to test the connection between these two networks.
 
 You can replace the `cmd` in the group section of yaml to run your own command. 
 The `scripts` dir will be "volumed" to containers.
@@ -75,13 +75,13 @@ and run
 ```
 
 ### 5. [optional] clean network
-Run ```./scripts/clean.sh```
+Run `./scripts/clean.sh`
 
 ## Modify Network Definition
-A sample network description is provided in ```example.yaml```, which you can edit directly.
+A sample network description is provided in `example.yaml`, which you can edit directly.
 
 ### sample
-```
+```yaml
 # Only support 10.250.0.2 ~ 10.250.254.254
 group:
   -
@@ -162,7 +162,7 @@ The network definition contains two sections: group and network. Group defines i
 - **nodes**: list of node in the network. 
 
 #### node
-- **ip**: Node IP must be between "10.250.0.2 ~ 10.250.254.254" and written in CIDR format, eg. ```10.250.1.2/32```.
+- **ip**: Node IP must be between "10.250.0.2 ~ 10.250.254.254" and written in CIDR format, eg. `10.250.1.2/32`.
 
 - **cmd**: Node command to run. Blocking or Non-blocking are both ok.
 
@@ -176,7 +176,7 @@ The following 6 tc network limit parameters are supported:
     reorder
     rate
     ```
-The values of these parameters are exactly like those of the ```tc``` command.
+The values of these parameters are exactly like those of the `tc` command.
 
 * `delay: "100ms 10ms 30%"` means 100ms delay in network and 30% packets +-10ms.
 * `duplicate: "1%"` means 1% packets is duplicated.
