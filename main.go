@@ -61,6 +61,13 @@ func keyInArray(key string, array []string) bool {
 	return false
 }
 
+func paramsCount(str string) int {
+	var params []string
+	str = strings.TrimSpace(str)
+	params = strings.Split(str, " ")
+	return len(params)
+}
+
 func processOneNode(node *node, groupName string, r root, nodemap map[string]bool) []string {
 
 	var tcRules []string
@@ -88,7 +95,11 @@ func processOneNode(node *node, groupName string, r root, nodemap map[string]boo
 			//	3.1 parse other node in same group
 			rule = "tc qdisc add dev eth0 parent 1:" + strconv.Itoa(tcIndex) + " handle " + strconv.Itoa(tcIndex) + ": netem"
 			if group.Delay != "" {
-				rule = rule + " delay " + group.Delay + " distribution normal"
+				if paramsCount(group.Delay) > 1 {
+					rule = rule + " delay " + group.Delay + " distribution normal"
+				} else {
+					rule = rule + " delay " + group.Delay
+				}
 			}
 			if group.Corrupt != "" {
 				rule = rule + " corrupt " + group.Corrupt
@@ -137,7 +148,11 @@ func processOneNode(node *node, groupName string, r root, nodemap map[string]boo
 
 					rule = "tc qdisc add dev eth0 parent 1:" + strconv.Itoa(tcIndex) + " handle " + strconv.Itoa(tcIndex) + ": netem"
 					if network.Delay != "" {
-						rule = rule + " delay " + network.Delay + " distribution normal"
+						if paramsCount(network.Delay) > 1 {
+							rule = rule + " delay " + network.Delay + " distribution normal"
+						} else {
+							rule = rule + " delay " + network.Delay
+						}
 					}
 					if network.Corrupt != "" {
 						rule = rule + " corrupt " + network.Corrupt
