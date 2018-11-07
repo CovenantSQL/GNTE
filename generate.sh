@@ -50,12 +50,24 @@ stopall() {
     done
 }
 
+startall() {
+    containers="$(docker ps --format '{{.Names}}' --filter 'network=CovenantSQL_testnet' --filter status=exited)"
+
+    for i in $containers; do
+        echo "Starting $i"
+        docker start $i
+    done
+}
+
 case "$1" in
     "stopone")
         stopone
         ;;
     'stopall')
         stopall
+        ;;
+    'startall')
+        startall
         ;;
     *)
         echo "Generate GNTE and running"

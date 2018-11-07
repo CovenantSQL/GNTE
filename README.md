@@ -41,6 +41,12 @@ And there is also a command to stop all:
 ./generate.sh stopall filter
 ```
 
+Also a command for restart all stopped nodes:
+
+```
+./generate.sh startall
+```
+
 ### 5. run your own program in testnet
 Containers are referenced by group_name+ip. For example, given containers 10.250.1.2 and 10.250.8.2, you can run `docker exec -it china10.250.1.2 ping 10.250.8.2` to test the connection between these two networks.
 
