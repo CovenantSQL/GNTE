@@ -1,6 +1,7 @@
 #!/bin/bash
 
-param=$2
+param=$1
+filter=$2
 
 generate() {
 
@@ -13,14 +14,14 @@ generate() {
         rm -rf $CLEAN
     fi
 
-    docker run --rm -it -v $DIR:$SRC gnte $SRC/scripts/gobuild.sh $*
+    docker run --rm -it -v $DIR:$SRC gnte $SRC/scripts/gobuild.sh $param
 
     $DIR/scripts/launch.sh
 }
 
 get_containers() {
-    if [ -n $param ]; then
-        containers="$(docker ps --format '{{.Names}}' --filter 'network=CovenantSQL_testnet' --filter name=$param)"
+    if [ -n $filter ]; then
+        containers="$(docker ps --format '{{.Names}}' --filter 'network=CovenantSQL_testnet' --filter name=$filter)"
     else
         containers="$(docker ps --format '{{.Names}}' --filter 'network=CovenantSQL_testnet')"
     fi
@@ -59,7 +60,7 @@ startall() {
     done
 }
 
-case "$1" in
+case $param in
     "stopone")
         stopone
         ;;
