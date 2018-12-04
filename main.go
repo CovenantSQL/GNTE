@@ -249,7 +249,7 @@ func printDockerScript(r root) {
 		for _, node := range group.Nodes {
 			ip := strings.Split(node.IP, "/")[0]
 			launchFileData = append(launchFileData, "echo starting "+group.Name+ip)
-			launchFileData = append(launchFileData, "docker run -dit --net CovenantSQL_testnet --ip "+ip+" -h "+group.Name+ip+
+			launchFileData = append(launchFileData, "docker run -d --net CovenantSQL_testnet --ip "+ip+" -h "+group.Name+ip+
 				" -v $DIR/scripts:/scripts --cap-add=NET_ADMIN --name "+group.Name+ip+" gnte /scripts/"+group.Name+ip+".sh")
 
 			cleanFileData = append(cleanFileData, "docker rm -f "+group.Name+ip)
@@ -259,7 +259,7 @@ func printDockerScript(r root) {
 
 	// run dot convertion
 	// dot -Tpng graph.gv -o graph.png
-	launchFileData = append(launchFileData, "docker run --rm -it -v $DIR/scripts:/scripts gnte dot -Tpng scripts/graph.gv -o scripts/graph.png")
+	launchFileData = append(launchFileData, "docker run --rm -v $DIR/scripts:/scripts gnte dot -Tpng scripts/graph.gv -o scripts/graph.png")
 	launchFileData = append(launchFileData, "mv -f $DIR/scripts/graph.png $DIR/graph.png")
 
 	launchFileByte := []byte(strings.Join(launchFileData, "\n") + "\n")
