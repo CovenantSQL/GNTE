@@ -241,9 +241,9 @@ func printDockerScript(r root) {
 	defer cleanFile.Close()
 
 	var launchFileData, cleanFileData []string
-	launchFileData = append(launchFileData, "#!/bin/bash\n")
+	launchFileData = append(launchFileData, "#!/bin/bash -x\n")
 	launchFileData = append(launchFileData, "docker network create --subnet=10.250.0.1/16 CovenantSQL_testnet")
-	cleanFileData = append(cleanFileData, "#!/bin/bash\n")
+	cleanFileData = append(cleanFileData, "#!/bin/bash -x\n")
 
 	for _, group := range r.Group {
 		for _, node := range group.Nodes {
