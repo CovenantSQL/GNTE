@@ -5,7 +5,7 @@ filter=$2
 
 generate() {
 
-    SRC="/gopath/src/github.com/CovenantSQL/GNTE"
+    SRC="/go/src/github.com/CovenantSQL/GNTE"
     export DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
     CLEAN=$DIR/scripts/clean.sh
 
@@ -14,7 +14,8 @@ generate() {
         rm -rf $CLEAN
     fi
 
-    docker run --rm -v $DIR:$SRC gnte $SRC/scripts/gobuild.sh $param
+    docker pull golang:1.11-stretch
+    docker run --rm -v $DIR:$SRC golang $SRC/scripts/gobuild.sh $param
 
     $DIR/scripts/launch.sh
 }
