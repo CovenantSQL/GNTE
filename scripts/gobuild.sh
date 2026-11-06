@@ -1,3 +1,3 @@
 #!/bin/sh
 cd /go/src/github.com/CovenantSQL/GNTE
-go run -mod=vendor main.go $*
+go run main.go $*
