@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -215,7 +216,7 @@ func printTcScript(rules []string, node *node, groupName string) {
 	//	fmt.Println(rulestr)
 	err := ioutil.WriteFile("scripts/"+groupName+ip+".sh", data, 0777)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 }
 
@@ -226,7 +227,7 @@ func printDockerScript(r root) {
 		0777,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	defer launchFile.Close()
 
@@ -236,7 +237,7 @@ func printDockerScript(r root) {
 		0777,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	defer cleanFile.Close()
 
@@ -265,13 +266,13 @@ func printDockerScript(r root) {
 	launchFileByte := []byte(strings.Join(launchFileData, "\n") + "\n")
 	_, err = launchFile.Write(launchFileByte)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	cleanFileByte := []byte(strings.Join(cleanFileData, "\n") + "\n")
 	_, err = cleanFile.Write(cleanFileByte)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 }
 
@@ -283,7 +284,7 @@ func printGraphScript(r root) {
 		0666,
 	)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 	defer gvFile.Close()
 
@@ -372,7 +373,7 @@ func printGraphScript(r root) {
 	gvFileByte := []byte(strings.Join(gvFileData, "\n") + "\n")
 	_, err = gvFile.Write(gvFileByte)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 }
 
@@ -399,12 +400,12 @@ func main() {
 
 	data, err := ioutil.ReadFile(configPath)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	err = yaml.Unmarshal(data, &r)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
 
 	nodemap := make(map[string]bool)
