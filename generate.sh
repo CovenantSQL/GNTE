@@ -14,7 +14,7 @@ generate() {
         rm -rf $CLEAN
     fi
 
-    docker run --rm -v $DIR:$SRC golang:1.27 $SRC/scripts/gobuild.sh $param
+    docker run --rm -v $DIR:$SRC golang:1.27 $SRC/scripts/gobuild.sh $param || exit
 
     $DIR/scripts/launch.sh
 }
